@@ -30,7 +30,6 @@ class WebServer(object):
     """Web server abstraction"""
 
     def __init__(self, port=80):
-        """Constructor to store params"""
         self.port = port
         self.running = False
         self.server = None
