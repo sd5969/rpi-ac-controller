@@ -1,6 +1,7 @@
 """Services for controlling hardware"""
 
 from threading import Thread
+from time import sleep
 
 class Controller(object):
     """Control abstraction"""
@@ -19,7 +20,7 @@ class Controller(object):
         self.running = True
         print "Started hardware controller"
         while self.running:
-            pass
+            sleep(1)
 
     def stop(self):
         """Stops controller"""
