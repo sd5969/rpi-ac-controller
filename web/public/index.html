@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AC Controller</title>
+  <script src="lib/angular/angular.min.js"></script>
+  <script>
+    var app = angular.module('acWebApp', []);
+    app.controller('acWebController', function($scope, $http) {
+        $scope.enableText = 'Enable Controller';
+        $scope.disableText = 'Disable Controller';
+        $scope.controllerEnabled = false;
+        $scope.temp = 70;
+        $scope.tempMax = 80;
+        $scope.tempMin = 60;
+
+        $scope.switchPower = function() {
+          $scope.controllerEnabled = !$scope.controllerEnabled;
+        }
+
+        $scope.increaseTemp = function() {
+          if($scope.temp <= $scope.tempMax) $scope.temp++;
+        }
+
+        $scope.decreaseTemp = function() {
+          if($scope.temp >= $scope.tempMin) $scope.temp--;
+        }
+
+        /* $http.get('api/status').then(res => {
+          $scope.enableText = res.data;
+        }); */
+    });
+  </script>
+  <style>
+    .pageBody {
+      padding: 20px;
+    }
+    .title {
+      font-weight: bold;
+    }
+    .controls {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body ng-app="acWebApp" ng-controller="acWebController">
+  <div class="pageBody">
+    <div class="status">
+      <span class="title">Controller Status:</span>
+      <span>{{controllerEnabled ? 'On' : 'Off'}}</span>
+    </div>
+    <div class="temperature">
+      <span class="title">Set Temperature:</span>
+      <span>{{temp}}</span>
+    </div>
+    <div class="controls">
+      <input type="button" ng-click="switchPower()"
+          value="{{controllerEnabled ? disableText : enableText}}" /><br />
+      <input type="button" ng-click="increaseTemp()"
+          value="Increase Temperature" ng-disabled="temp >= tempMax"/><br />
+      <input type="button" ng-click="decreaseTemp()"
+          value="Decrease Temperature"ng-disabled="temp <= tempMin" />
+    </div>
+  </div>
+</body>
+</html>

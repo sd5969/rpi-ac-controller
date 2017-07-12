@@ -1,0 +1,17 @@
+{
+  "name": "acWeb",
+  "homepage": "https://github.com/sdlynx/rpi-ac-controller",
+  "authors": [
+    "Sanjit Dutta <sdlynx@gmail.com>"
+  ],
+  "description": "Web app for AC controller",
+  "main": "index.html",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
