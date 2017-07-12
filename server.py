@@ -8,23 +8,84 @@ class _apiHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         """Handles GET requests"""
-        self.send_response(200)
-        self.send_header("Content-type", "text/json")
-        self.end_headers()
-        self.wfile.write("Hello GET World!")
+
+        def get_file(self):
+            """Serves root file"""
+            if self.path == '/':
+                self.path = '/index.html'
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            return_file = None
+            with file('web/public/' + self.path[1:]) as out_file:
+                return_file = out_file.read()
+            self.wfile.write(return_file)
+
+        def get_temp(self):
+            """API endpoint to get temp sensor value"""
+            self.send_response(200)
+            self.send_header("Content-type", "application/json")
+            self.end_headers()
+            self.wfile.write('{ "temperature": 70 }')
+
+        def get_controller(self):
+            """API endpoint to get temp sensor value"""
+            self.send_response(200)
+            self.send_header("Content-type", "application/json")
+            self.end_headers()
+            self.wfile.write('{ "enabled": false }')
+
+        def get_default(self):
+            """Default return"""
+            self.send_response(404)
+            self.send_header("Content-length", "0")
+            self.end_headers()
+
+        options = {
+            '/': get_file,
+            '/lib/angular/angular.min.js': get_file,
+            '/api/temperature': get_temp,
+            '/api/controller': get_controller
+        }
+        options.get(self.path, get_default)(self)
 
     def do_HEAD(self):
         """Handles HEAD requests"""
         self.send_response(200)
-        self.send_header("Content-type", "text/json")
+        self.send_header("Content-length", "0")
         self.end_headers()
 
     def do_POST(self):
         """Handles POST requests"""
+
+        def post_temp(self):
+            """Save new temperature setting"""
+            self.send_response(201)
+            self.send_header("Content-length", "0")
+            self.end_headers()
+
+        def post_controller(self):
+            """Enable or disable controller"""
+            self.send_response(201)
+            self.send_header("Content-length", "0")
+            self.end_headers()
+
+        def post_default(self):
+            """Default return"""
+            self.send_response(404)
+            self.send_header("Content-length", "0")
+            self.end_headers()
+
+        options = {
+            '/api/temperature': post_temp,
+            '/api/controller': post_controller
+        }
+        options.get(self.path, post_default)(self)
+
         self.send_response(200)
         self.send_header("Content-type", "text/json")
         self.end_headers()
-        self.wfile.write("Hello POST World!")
+        self.wfile.write("{ \"message\": \"Hello POST World!\"")
 
 class WebServer(object):
     """Web server abstraction"""
