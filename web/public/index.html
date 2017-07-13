@@ -9,21 +9,128 @@
     app.controller('acWebController', function($scope, $http) {
         $scope.enableText = 'Enable Controller';
         $scope.disableText = 'Disable Controller';
-        $scope.controllerEnabled = false;
+        $scope.acControllerEnabled = false;
+        $scope.webControlsEnabled = true;
         $scope.temp = 70;
         $scope.tempMax = 80;
         $scope.tempMin = 60;
+        $scope.error = '';
+
+        function setControls(enabled) {
+          $scope.webControlsEnabled = enabled;
+        }
+
+        function setError(error) {
+          $scope.error = error;
+        }
+
+        setControls(false);
+        var initPromises = [];
+
+        initPromises.push(
+          $http({
+            method: 'GET',
+            url: '/api/controller'
+          })
+          .then(res => {
+            $scope.acControllerEnabled = res.data.enabled;
+            setError('');
+            setControls(true);
+          })
+          .catch(err => {
+            setError(err);
+            setControls(true);
+          })
+        );
+
+        initPromises.push(
+          $http({
+            method: 'GET',
+            url: '/api/temperature'
+          })
+          .then(res => {
+            $scope.temp = res.data.temperature;
+            setError('');
+            setControls(true);
+          })
+          .catch(err => {
+            setError(err);
+            setControls(true);
+          })
+        );
+
+        Promise.all(initPromises)
+        .then(() => {
+          setError('');
+          setControls(true);
+        })
+        .catch(err => {
+          setError(err);
+          setControls(true);
+        });
 
         $scope.switchPower = function() {
-          $scope.controllerEnabled = !$scope.controllerEnabled;
+          var isEnabled = !$scope.acControllerEnabled;
+          setControls(false);
+          $http({
+            method: 'POST',
+            url: '/api/controller',
+            data: '{"enabled": "' + isEnabled + '"}',
+            headers: {'Content-type': 'application/json'}
+          })
+          .then(res => {
+            $scope.acControllerEnabled = isEnabled;
+            setError('');
+            setControls(true);
+          })
+          .catch(err => {
+            setError(err);
+            setControls(true);
+          });
         }
 
         $scope.increaseTemp = function() {
-          if($scope.temp <= $scope.tempMax) $scope.temp++;
+          if($scope.temp < $scope.tempMax) {
+            var temp = $scope.temp + 1;
+            setControls(false);
+            $http({
+              method: 'POST',
+              url: '/api/temperature',
+              data: '{"temperature": "' + temp + '"}',
+              headers: {'Content-type': 'application/json'}
+            })
+            .then(res => {
+              $scope.temp = temp;
+              setError('');
+              setControls(true);
+            })
+            .catch(err => {
+              setError(err);
+              setControls(true);
+            });
+          }
         }
 
         $scope.decreaseTemp = function() {
-          if($scope.temp >= $scope.tempMin) $scope.temp--;
+          if($scope.temp > $scope.tempMin) {
+            var temp = $scope.temp - 1;
+            setControls(false);
+            $http({
+              method: 'POST',
+              url: '/api/temperature',
+              data: '{"temperature": "' + temp + '"}',
+              headers: {'Content-type': 'application/json'}
+            })
+            .then(res => {
+              $scope.temp = temp;
+              setError('');
+              setControls(true);
+            })
+            .catch(err => {
+              setError(err);
+              setControls(true);
+            });
+          }
         }
 
         /* $http.get('api/status').then(res => {
@@ -47,7 +154,7 @@
   <div class="pageBody">
     <div class="status">
       <span class="title">Controller Status:</span>
-      <span>{{controllerEnabled ? 'On' : 'Off'}}</span>
+      <span>{{acControllerEnabled ? 'On' : 'Off'}}</span>
     </div>
     <div class="temperature">
       <span class="title">Set Temperature:</span>
@@ -55,11 +162,17 @@
     </div>
     <div class="controls">
       <input type="button" ng-click="switchPower()"
-          value="{{controllerEnabled ? disableText : enableText}}" /><br />
+          value="{{controllerEnabled ? disableText : enableText}}"
+          ng-disabled="!webControlsEnabled" /><br />
       <input type="button" ng-click="increaseTemp()"
-          value="Increase Temperature" ng-disabled="temp >= tempMax"/><br />
+          value="Increase Temperature"
+          ng-disabled="temp >= tempMax || !webControlsEnabled"/><br />
       <input type="button" ng-click="decreaseTemp()"
-          value="Decrease Temperature"ng-disabled="temp <= tempMin" />
+          value="Decrease Temperature"
+          ng-disabled="temp <= tempMin || !webControlsEnabled" />
+    </div>
+    <div class="error">
+      {{error}}
     </div>
   </div>
 </body>
