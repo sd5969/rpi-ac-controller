@@ -6,16 +6,16 @@ from time import sleep
 
 def main():
     """Runs the application as a service"""
-    server = WebServer()
     controller = Controller()
+    server = WebServer(port=80, controller=controller)
     try:
-        server.serve()
         controller.run()
+        server.serve()
         while 1:
             sleep(1)
     except KeyboardInterrupt:
-        server.shutdown()
         controller.stop()
+        server.shutdown()
 
 if __name__ == '__main__':
     main()
