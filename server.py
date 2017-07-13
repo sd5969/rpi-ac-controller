@@ -48,6 +48,7 @@ class _apiHandler(BaseHTTPRequestHandler):
             response = {
                 'enabled': self.controller_enabled
             }
+            print self.controller_enabled
             self.wfile.write(json.dumps(response))
 
         def get_default(self):
@@ -80,7 +81,7 @@ class _apiHandler(BaseHTTPRequestHandler):
             self.end_headers()
             if 'temperature' in body:
                 try:
-                    new_temp = int(body.temperature)
+                    new_temp = int(body['temperature'])
                 except ValueError:
                     pass
             if new_temp <= MAX_TEMP and new_temp >= MIN_TEMP:
@@ -93,7 +94,8 @@ class _apiHandler(BaseHTTPRequestHandler):
             self.end_headers()
             if 'enabled' in body:
                 try:
-                    self.controller_enabled = (body.enabled == "True")
+                    self.controller_enabled = (body['enabled'] == "true")
+                    print self.controller_enabled
                 except ValueError:
                     pass
 
@@ -107,7 +109,7 @@ class _apiHandler(BaseHTTPRequestHandler):
         if content_length > 0:
             post_body = self.rfile.read(content_length)
             parsed_body = json.loads(post_body)
-            print parsed_body
+            # print parsed_body
         else:
             parsed_body = {}
 
