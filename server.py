@@ -2,9 +2,18 @@
 
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from threading import Thread
+import json
+
+MAX_TEMP = 80
+MIN_TEMP = 60
 
 class _apiHandler(BaseHTTPRequestHandler):
     """Class for handling API requests"""
+
+    def __init__(self, *args, **kwargs):
+        self.temperature = 70
+        self.controller_enabled = False
+        BaseHTTPRequestHandler.__init__(self, *args, **kwargs)
 
     def do_GET(self):
         """Handles GET requests"""
@@ -26,14 +35,20 @@ class _apiHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-type", "application/json")
             self.end_headers()
-            self.wfile.write('{ "temperature": 70 }')
+            response = {
+                'temperature': self.temperature
+            }
+            self.wfile.write(json.dumps(response))
 
         def get_controller(self):
             """API endpoint to get temp sensor value"""
             self.send_response(200)
             self.send_header("Content-type", "application/json")
             self.end_headers()
-            self.wfile.write('{ "enabled": false }')
+            response = {
+                'enabled': self.controller_enabled
+            }
+            self.wfile.write(json.dumps(response))
 
         def get_default(self):
             """Default return"""
@@ -58,29 +73,49 @@ class _apiHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         """Handles POST requests"""
 
-        def post_temp(self):
+        def post_temp(self, body):
             """Save new temperature setting"""
             self.send_response(201)
             self.send_header("Content-length", "0")
             self.end_headers()
+            if 'temperature' in body:
+                try:
+                    new_temp = int(body.temperature)
+                except ValueError:
+                    pass
+            if new_temp <= MAX_TEMP and new_temp >= MIN_TEMP:
+                self.temperature = new_temp
 
-        def post_controller(self):
+        def post_controller(self, body):
             """Enable or disable controller"""
             self.send_response(201)
             self.send_header("Content-length", "0")
             self.end_headers()
+            if 'enabled' in body:
+                try:
+                    self.controller_enabled = (body.enabled == "True")
+                except ValueError:
+                    pass
 
-        def post_default(self):
+        def post_default(self, _):
             """Default return"""
             self.send_response(404)
             self.send_header("Content-length", "0")
             self.end_headers()
 
+        content_length = int(self.headers.getheader('content-length'))
+        if content_length > 0:
+            post_body = self.rfile.read(content_length)
+            parsed_body = json.loads(post_body)
+            print parsed_body
+        else:
+            parsed_body = {}
+
         options = {
             '/api/temperature': post_temp,
             '/api/controller': post_controller
         }
-        options.get(self.path, post_default)(self)
+        options.get(self.path, post_default)(self, parsed_body)
 
         self.send_response(200)
         self.send_header("Content-type", "text/json")
