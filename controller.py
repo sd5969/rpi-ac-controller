@@ -3,23 +3,27 @@
 from threading import Thread
 from time import sleep
 from datetime import datetime
+import RPi.GPIO as GPIO
 
 TEMP_MAX = 80 # Fahrenheit
 TEMP_MIN = 60 # Fahrenheit
 THRESHOLD = 2 # Fahrenheit
 MIN_TIME = 180 # seconds
+BLINK_TIME = 1 # seconds
+LED_1_INDEX = 7
+LED_2_INDEX = 8
 
 class Controller(object):
     """Control abstraction"""
 
     def __init__(self):
-        self.thread = None                                  # for running in multithread
-        self.running = False                                # continues control loop if true
-        self.controls = {}                                  # variables to control the system
-        self.measurements = {}                              # variables for system input
+        self.thread = None     # for running in multithread
+        self.running = False   # continues control loop if true
+        self.controls = {}     # variables to control the system
+        self.measurements = {} # variables for system input
 
-        self.measurements['actual_temperature'] = 65        # outside temperature
-        self.measurements['button_state'] = False           # push button (not momentary) state
+        self.measurements['actual_temperature'] = 65 # outside temperature
+        self.measurements['button_state'] = False    # push button (not momentary) state
 
         self.controls['temperature'] = 70                   # target temperature
         self.controls['enabled'] = False                    # controller enabled?
@@ -29,7 +33,13 @@ class Controller(object):
         self.controls['led_1'] = False                      # indicates if AC is turned on
         self.controls['led_2'] = False                      # indicates state of controller enabled
         self.controls['led_2_blink'] = False                # indicates state of override
+        self.controls['led_2_bl_change'] = datetime.now()   # last change time for blink
+        self.controls['led_2_bl_state'] = False             # led blink state
         self.controls['servo_angle'] = -15                  # servo angle, default off
+
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(LED_1_INDEX, GPIO.OUT)
+        GPIO.setup(LED_2_INDEX, GPIO.OUT)
 
     def run(self):
         """Runs controller in new thread"""
@@ -42,17 +52,17 @@ class Controller(object):
         print "Started hardware controller"
         self.controls['last_state_change'] = datetime.now()
         while self.running:
+            last_change_diff = (datetime.now() - \
+              self.controls['last_state_change']).total_seconds()
             if self.controls['override']:
                 self.enable_ac(True)
-            elif self.controls['enabled'] and \
-              (datetime.now() - self.controls['last_state_change']).seconds > MIN_TIME:
+            elif self.controls['enabled'] and last_change_diff > MIN_TIME:
                 outside_temp = self.read_temperature()
                 if outside_temp < (self.controls['temperature'] - THRESHOLD):
                     self.enable_ac(False)
                 if outside_temp > (self.controls['temperature'] + THRESHOLD):
                     self.enable_ac(True)
-            elif not self.controls['enabled'] and \
-              (datetime.now() - self.controls['last_state_change']).seconds > MIN_TIME:
+            elif not self.controls['enabled'] and last_change_diff > MIN_TIME:
                 self.enable_ac(False)
 
             self.set_button_state()
@@ -124,22 +134,23 @@ class Controller(object):
         """Sets LED 1 based on instance vars (ac_on)"""
         self.controls['led_1'] = self.controls['ac_on']
         if self.controls['led_1']:
-            # set LED 1 on
-            pass
+            GPIO.output(LED_1_INDEX, True)
         else:
-            # set LED 1 off
-            pass
+            GPIO.output(LED_1_INDEX, False)
 
     def set_led_2(self):
         """Sets LED 2 based on instance vars (enabled, override)"""
         self.controls['led_2'] = self.controls['enabled']
         self.controls['led_2_blink'] = self.controls['override']
         if self.controls['led_2_blink']:
-            # set LED 2 to blink
-            pass
+            last_change_diff = (datetime.now() - \
+              self.controls['led_2_bl_change']).total_seconds()
+            if  last_change_diff > BLINK_TIME:
+                self.controls['led_2_bl_state'] \
+                  = not self.controls['led_2_bl_state']
+                self.controls['led_2_bl_change'] = datetime.now()
+                GPIO.output(LED_2_INDEX, self.controls['led_2_bl_state'])
         elif self.controls['led_2']:
-            # set LED 2 on
-            pass
+            GPIO.output(LED_2_INDEX, True)
         else:
-            # set LED 2 off
-            pass
+            GPIO.output(LED_2_INDEX, False)
