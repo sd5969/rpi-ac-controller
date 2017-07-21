@@ -61,10 +61,6 @@ class Controller(object):
             self.set_led_1()
             self.set_led_2()
 
-            # if AC is on solid LED 1
-            # if override blink LED 2
-            # if enabled solid LED 2
-
             sleep(0.1)
 
     def stop(self):
