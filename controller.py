@@ -10,8 +10,12 @@ TEMP_MIN = 60 # Fahrenheit
 THRESHOLD = 2 # Fahrenheit
 MIN_TIME = 180 # seconds
 BLINK_TIME = 1 # seconds
-LED_1_INDEX = 7
-LED_2_INDEX = 8
+LED_1_INDEX = 7 # pinout
+LED_2_INDEX = 8 # pinout
+BUTTON_INDEX = 9 # pinout
+SERVO_INDEX = 10 # pinout
+SERVO_OFF_ANGLE = 15 # degrees
+SERVO_ON_ANGLE = -15 # degrees
 
 class Controller(object):
     """Control abstraction"""
@@ -36,10 +40,15 @@ class Controller(object):
         self.controls['led_2_bl_change'] = datetime.now()   # last change time for blink
         self.controls['led_2_bl_state'] = False             # led blink state
         self.controls['servo_angle'] = -15                  # servo angle, default off
+        self.controls['servo_pwm'] = None                   # servo output object
 
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup(LED_1_INDEX, GPIO.OUT)
         GPIO.setup(LED_2_INDEX, GPIO.OUT)
+        GPIO.setup(SERVO_INDEX, GPIO.OUT)
+        GPIO.setup(BUTTON_INDEX, GPIO.IN)
+        self.controls['servo_pwm'] = GPIO.PWM(SERVO_INDEX, 50) # 50 Hz for servo
+        self.controls['servo_pwm'].start(self.angle_to_pwm(0))
 
     def run(self):
         """Runs controller in new thread"""
@@ -71,11 +80,12 @@ class Controller(object):
             self.set_led_1()
             self.set_led_2()
 
-            sleep(0.1)
+            sleep(0.05)
 
     def stop(self):
         """Stops controller"""
         self.running = False
+        GPIO.cleanup()
         print "Stopping hardware controller"
         self.thread.join()
 
@@ -119,15 +129,14 @@ class Controller(object):
     def set_servo(self, servo_on):
         """Sets servo to turn AC either on or off"""
         if servo_on:
-            self.controls['servo_angle'] = -15
+            self.controls['servo_angle'] = SERVO_ON_ANGLE
         else:
-            self.controls['servo_angle'] = 15
-        # set servo here
+            self.controls['servo_angle'] = SERVO_OFF_ANGLE
+        self.controls['servo_pwm'].ChangeDutyCycle(self.controls['servo_angle'])
 
     def set_button_state(self):
         """Uses status of button and web server to determine button state"""
-        # read button here
-        self.measurements['button_state'] = True
+        self.measurements['button_state'] = GPIO.input(BUTTON_INDEX)
         self.set_controller_state(self.measurements['button_state'])
 
     def set_led_1(self):
@@ -154,3 +163,9 @@ class Controller(object):
             GPIO.output(LED_2_INDEX, True)
         else:
             GPIO.output(LED_2_INDEX, False)
+
+    @staticmethod
+    def angle_to_pwm(angle):
+        """Converts angle to duty cycle (0-100)"""
+        duty_cycle = ((angle / 180.0) + 1.0) * 5.0
+        return duty_cycle
