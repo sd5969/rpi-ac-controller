@@ -17,6 +17,11 @@ SERVO_INDEX = 10 # pinout
 SERVO_OFF_ANGLE = 15 # degrees
 SERVO_ON_ANGLE = -15 # degrees
 
+SPICLK = 18 # pinout
+SPIMISO = 23 # pinout
+SPIMOSI = 24 # pinout
+SPICS = 25 # pinout
+
 class Controller(object):
     """Control abstraction"""
 
@@ -49,6 +54,11 @@ class Controller(object):
         GPIO.setup(BUTTON_INDEX, GPIO.IN)
         self.controls['servo_pwm'] = GPIO.PWM(SERVO_INDEX, 50) # 50 Hz for servo
         self.controls['servo_pwm'].start(self.angle_to_pwm(0))
+
+        GPIO.setup(SPIMOSI, GPIO.OUT)
+        GPIO.setup(SPIMISO, GPIO.IN)
+        GPIO.setup(SPICLK, GPIO.OUT)
+        GPIO.setup(SPICS, GPIO.OUT)
 
     def run(self):
         """Runs controller in new thread"""
@@ -123,7 +133,8 @@ class Controller(object):
 
     def read_temperature(self):
         """Reads outside temp and returns as Fahrenheit"""
-        # read temp here
+        self.measurements['actual_temperature'] \
+          = self.readadc(0, SPICLK, SPIMOSI, SPIMISO, SPICS)
         return self.measurements['actual_temperature']
 
     def set_servo(self, servo_on):
@@ -169,3 +180,40 @@ class Controller(object):
         """Converts angle to duty cycle (0-100)"""
         duty_cycle = ((angle / 180.0) + 1.0) * 5.0
         return duty_cycle
+
+    # read SPI data from MCP3002 chip, 2 possible adc's (0 thru 1)
+    @staticmethod
+    def readadc(adcnum, clockpin, mosipin, misopin, cspin):
+        """Reads ADC MCP3002"""
+        if (adcnum > 1) or (adcnum < 0):
+            return -1
+        GPIO.output(cspin, True)
+
+        GPIO.output(clockpin, False)  # start clock low
+        GPIO.output(cspin, False)     # bring CS low
+
+        commandout = adcnum
+        commandout |= 0x18  # start bit + single-ended bit
+        commandout <<= 3    # we only need to send 5 bits here
+        for _ in range(5):
+            if commandout & 0x80:
+                GPIO.output(mosipin, True)
+            else:
+                GPIO.output(mosipin, False)
+            commandout <<= 1
+            GPIO.output(clockpin, True)
+            GPIO.output(clockpin, False)
+
+        adcout = 0
+        # read in one empty bit, one null bit and 10 ADC bits
+        for __ in range(12):
+            GPIO.output(clockpin, True)
+            GPIO.output(clockpin, False)
+            adcout <<= 1
+            if GPIO.input(misopin):
+                adcout |= 0x1
+
+        GPIO.output(cspin, True)
+
+        adcout >>= 1       # first bit is 'null' so drop it
+        return adcout
