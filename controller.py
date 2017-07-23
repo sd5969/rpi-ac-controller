@@ -143,7 +143,8 @@ class Controller(object):
             self.controls['servo_angle'] = SERVO_ON_ANGLE
         else:
             self.controls['servo_angle'] = SERVO_OFF_ANGLE
-        self.controls['servo_pwm'].ChangeDutyCycle(self.controls['servo_angle'])
+        self.controls['servo_pwm'].ChangeDutyCycle( \
+          self.angle_to_pwm(self.controls['servo_angle']))
 
     def set_button_state(self):
         """Uses status of button and web server to determine button state"""
