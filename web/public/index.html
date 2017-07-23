@@ -9,7 +9,10 @@
     app.controller('acWebController', function($scope, $http) {
         $scope.enableText = 'Enable Controller';
         $scope.disableText = 'Disable Controller';
+        $scope.enableOverride = 'Enable Override';
+        $scope.disableOverride = 'Disable Override';
         $scope.acControllerEnabled = false;
+        $scope.acOverrrideEnabled = false;
         $scope.webControlsEnabled = true;
         $scope.temp = 70;
         $scope.tempMax = 80;
@@ -59,6 +62,22 @@
           })
         );
 
+        initPromises.push(
+          $http({
+            method: 'GET',
+            url: '/api/override'
+          })
+          .then(res => {
+            $scope.acOverrideEnabled = res.data.enabled;
+            setError('');
+            setControls(true);
+          })
+          .catch(err => {
+            setError(err);
+            setControls(true);
+          })
+        );
+
         Promise.all(initPromises)
         .then(() => {
           setError('');
@@ -80,6 +99,26 @@
           })
           .then(res => {
             $scope.acControllerEnabled = isEnabled;
+            setError('');
+            setControls(true);
+          })
+          .catch(err => {
+            setError(err);
+            setControls(true);
+          });
+        }
+
+        $scope.switchOverride = function() {
+          var isEnabled = !$scope.acOverrideEnabled;
+          setControls(false);
+          $http({
+            method: 'POST',
+            url: '/api/override',
+            data: '{"enabled": "' + isEnabled + '"}',
+            headers: {'Content-type': 'application/json'}
+          })
+          .then(res => {
+            $scope.acOverrideEnabled = isEnabled;
             setError('');
             setControls(true);
           })
@@ -156,13 +195,20 @@
       <span class="title">Controller Status:</span>
       <span>{{acControllerEnabled ? 'On' : 'Off'}}</span>
     </div>
+    <div class="status">
+      <span class="title">AC Override Status:</span>
+      <span>{{acOverrideEnabled ? 'On' : 'Off'}}</span>
+    </div>
     <div class="temperature">
       <span class="title">Set Temperature:</span>
       <span>{{temp}}</span>
     </div>
     <div class="controls">
       <input type="button" ng-click="switchPower()"
-          value="{{controllerEnabled ? disableText : enableText}}"
+          value="{{acControllerEnabled ? disableText : enableText}}"
+          ng-disabled="!webControlsEnabled" /><br />
+      <input type="button" ng-click="switchOverride()"
+          value="{{acOverrideEnabled ? disableOverride : enableOverride}}"
           ng-disabled="!webControlsEnabled" /><br />
       <input type="button" ng-click="increaseTemp()"
           value="Increase Temperature"

@@ -41,8 +41,18 @@ def _api_handler_factory(controller):
                 }
                 self.wfile.write(json.dumps(response))
 
+            def get_override(self):
+                """API endpoint to get AC override state"""
+                self.send_response(200)
+                self.send_header("Content-type", "application/json")
+                self.end_headers()
+                response = {
+                    'temperature': self.controller.get_override()
+                }
+                self.wfile.write(json.dumps(response))
+
             def get_controller(self):
-                """API endpoint to get temp sensor value"""
+                """API endpoint to get controller-enabled value"""
                 self.send_response(200)
                 self.send_header("Content-type", "application/json")
                 self.end_headers()
@@ -61,7 +71,8 @@ def _api_handler_factory(controller):
                 '/': get_file,
                 '/lib/angular/angular.min.js': get_file,
                 '/api/temperature': get_temp,
-                '/api/controller': get_controller
+                '/api/controller': get_controller,
+                '/api/override': get_override
             }
             options.get(self.path, get_default)(self)
 
@@ -96,6 +107,15 @@ def _api_handler_factory(controller):
                     state = (body['enabled'] == "true")
                     self.controller.set_controller_state(state)
 
+            def post_override(self, body):
+                """Enable or disable AC override"""
+                self.send_response(201)
+                self.send_header("Content-length", "0")
+                self.end_headers()
+                if 'enabled' in body:
+                    state = (body['enabled'] == "true")
+                    self.controller.set_override(state)
+
             def post_default(self, _):
                 """Default return"""
                 self.send_response(404)
@@ -112,7 +132,8 @@ def _api_handler_factory(controller):
 
             options = {
                 '/api/temperature': post_temp,
-                '/api/controller': post_controller
+                '/api/controller': post_controller,
+                '/api/override': post_override
             }
             options.get(self.path, post_default)(self, parsed_body)
 
