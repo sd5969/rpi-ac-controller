@@ -31,8 +31,9 @@ class Controller(object):
         self.controls = {}     # variables to control the system
         self.measurements = {} # variables for system input
 
-        self.measurements['actual_temperature'] = 65 # outside temperature
-        self.measurements['button_state'] = False    # push button (not momentary) state
+        self.measurements['actual_temperature'] = 65   # outside temperature
+        self.measurements['button_state'] = False      # push button (not momentary) state
+        self.measurements['last_button_state'] = False # push button last state
 
         self.controls['temperature'] = 70                   # target temperature
         self.controls['enabled'] = False                    # controller enabled?
@@ -148,8 +149,10 @@ class Controller(object):
 
     def set_button_state(self):
         """Uses status of button and web server to determine button state"""
+        self.measurements['last_button_state'] = self.measurements['button_state']
         self.measurements['button_state'] = GPIO.input(BUTTON_INDEX)
-        self.set_controller_state(self.measurements['button_state'])
+        if self.measurements['last_button_state'] != self.measurements['button_state']:
+            self.set_controller_state(not self.get_controller_state())
 
     def set_led_1(self):
         """Sets LED 1 based on instance vars (ac_on)"""
