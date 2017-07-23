@@ -61,6 +61,9 @@ class Controller(object):
         GPIO.setup(SPICLK, GPIO.OUT)
         GPIO.setup(SPICS, GPIO.OUT)
 
+        self.measurements['button_state'] = GPIO.input(BUTTON_INDEX)
+        self.measurements['last_button_state'] = GPIO.input(BUTTON_INDEX)
+
     def run(self):
         """Runs controller in new thread"""
         self.thread = Thread(target=self._run)
