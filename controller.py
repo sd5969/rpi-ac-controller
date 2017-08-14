@@ -56,10 +56,10 @@ class Controller(object):
         self.controls['servo_pwm'] = GPIO.PWM(SERVO_INDEX, 50) # 50 Hz for servo
         self.controls['servo_pwm'].start(self.angle_to_pwm(0))
 
-        GPIO.setup(SPIMOSI, GPIO.OUT)
-        GPIO.setup(SPIMISO, GPIO.IN)
-        GPIO.setup(SPICLK, GPIO.OUT)
-        GPIO.setup(SPICS, GPIO.OUT)
+        # GPIO.setup(SPIMOSI, GPIO.OUT)
+        # GPIO.setup(SPIMISO, GPIO.IN)
+        # GPIO.setup(SPICLK, GPIO.OUT)
+        # GPIO.setup(SPICS, GPIO.OUT)
 
         self.measurements['button_state'] = GPIO.input(BUTTON_INDEX)
         self.measurements['last_button_state'] = GPIO.input(BUTTON_INDEX)
