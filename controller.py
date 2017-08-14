@@ -10,17 +10,17 @@ TEMP_MIN = 60 # Fahrenheit
 THRESHOLD = 2 # Fahrenheit
 MIN_TIME = 180 # seconds
 BLINK_TIME = 1 # seconds
-LED_1_INDEX = 7 # pinout
-LED_2_INDEX = 8 # pinout
-BUTTON_INDEX = 9 # pinout
-SERVO_INDEX = 10 # pinout
+LED_1_INDEX = 17 # pinout
+LED_2_INDEX = 27 # pinout
+BUTTON_INDEX = 25 # pinout
+SERVO_INDEX = 18 # pinout
 SERVO_OFF_ANGLE = 15 # degrees
 SERVO_ON_ANGLE = -15 # degrees
 
-SPICLK = 18 # pinout
-SPIMISO = 23 # pinout
-SPIMOSI = 24 # pinout
-SPICS = 25 # pinout
+SPICLK = 11 # pinout
+SPIMISO = 9 # pinout
+SPIMOSI = 10 # pinout
+SPICS = 8 # pinout
 
 class Controller(object):
     """Control abstraction"""
@@ -48,7 +48,7 @@ class Controller(object):
         self.controls['servo_angle'] = -15                  # servo angle, default off
         self.controls['servo_pwm'] = None                   # servo output object
 
-        GPIO.setmode(GPIO.BOARD)
+        GPIO.setmode(GPIO.BCM)
         GPIO.setup(LED_1_INDEX, GPIO.OUT)
         GPIO.setup(LED_2_INDEX, GPIO.OUT)
         GPIO.setup(SERVO_INDEX, GPIO.OUT)
@@ -137,8 +137,9 @@ class Controller(object):
 
     def read_temperature(self):
         """Reads outside temp and returns as Fahrenheit"""
-        self.measurements['actual_temperature'] \
-          = self.readadc(0, SPICLK, SPIMOSI, SPIMISO, SPICS)
+        analog_read = self.readadc(0, SPICLK, SPIMOSI, SPIMISO, SPICS)
+        temp_celsius = analog_read * 100
+        self.measurements['actual_temperature'] = temp_celsius * 9.0 / 5.0 + 32.0
         return self.measurements['actual_temperature']
 
     def set_servo(self, servo_on):
