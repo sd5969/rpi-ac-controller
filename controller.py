@@ -94,7 +94,7 @@ class Controller(object):
             self.set_led_1()
             self.set_led_2()
 
-            sleep(0.05)
+            sleep(1)
 
     def stop(self):
         """Stops controller"""
