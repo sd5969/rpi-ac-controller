@@ -16,6 +16,7 @@ def main():
     except KeyboardInterrupt:
         controller.stop()
         server.shutdown()
+        quit()
 
 if __name__ == '__main__':
     main()
