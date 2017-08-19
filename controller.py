@@ -67,6 +67,7 @@ class Controller(object):
     def run(self):
         """Runs controller in new thread"""
         self.thread = Thread(target=self._run)
+        self.thread.daemon = True
         self.thread.start()
 
     def _run(self):

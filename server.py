@@ -179,6 +179,7 @@ class WebServer(object):
     def serve(self):
         """Serves web server in new thread"""
         self.thread = Thread(target=self._serve)
+        self.thread.daemon = True
         self.thread.start()
 
     def shutdown(self):
