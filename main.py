@@ -7,7 +7,7 @@ from time import sleep
 def main():
     """Runs the application as a service"""
     controller = Controller()
-    server = WebServer(port=80, controller=controller)
+    server = WebServer(port=8181, controller=controller)
     try:
         controller.run()
         server.serve()
