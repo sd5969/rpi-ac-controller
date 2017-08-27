@@ -79,10 +79,10 @@ class Controller(object):
         while self.running:
             count = count + 1
             if count % 10 == 0:
-                print "Controls"
+                print "\nControls"
                 for iprop in self.controls:
                     print iprop, self.controls[iprop]
-                print "Measurements"
+                print "\nMeasurements"
                 for iprop in self.measurements:
                     print iprop, self.measurements[iprop]
             last_change_diff = (datetime.now() - \
