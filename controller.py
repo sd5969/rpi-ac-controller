@@ -78,7 +78,7 @@ class Controller(object):
         count = 0
         while self.running:
             count = count + 1
-            if count % 10 == 0:
+            if count % 200 == 0:
                 print "\nControls"
                 for iprop in self.controls:
                     print iprop, self.controls[iprop]
@@ -99,12 +99,12 @@ class Controller(object):
                 self.enable_ac(False)
 
             self.set_button_state()
-            self.controls['override'] = (True and self.measurements['button_state'])
+            # self.controls['override'] = (True and self.measurements['button_state'])
 
             self.set_led_1()
             self.set_led_2()
 
-            sleep(1)
+            sleep(0.01)
 
     def stop(self):
         """Stops controller"""
