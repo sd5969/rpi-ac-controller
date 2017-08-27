@@ -187,4 +187,4 @@ class WebServer(object):
         self.running = False
         print "Shutting down web server"
         self.server.server_close()
-        self.thread.join()
+        # self.thread.join()

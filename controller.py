@@ -102,7 +102,7 @@ class Controller(object):
         self.running = False
         GPIO.cleanup()
         print "Stopping hardware controller"
-        self.thread.join()
+        # self.thread.join()
 
     def set_temperature(self, temperature):
         """Sets temperature for controller"""
