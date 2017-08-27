@@ -75,7 +75,18 @@ class Controller(object):
         self.running = True
         print "Started hardware controller"
         self.controls['last_state_change'] = datetime.now()
+        count = 0
         while self.running:
+            count = count + 1
+            if count % 50 == 0:
+                for xprop in self.controls:
+                    print xprop
+                    for yprop in self.controls[xprop]:
+                        print (yprop, ':', self.controls[xprop][yprop])
+                for xprop in self.measurements:
+                    print xprop
+                    for yprop in self.measurements[xprop]:
+                        print (yprop, ':', self.measurements[xprop][yprop])
             last_change_diff = (datetime.now() - \
               self.controls['last_state_change']).total_seconds()
             if self.controls['override']:
