@@ -22,6 +22,8 @@ SPIMISO = 9 # pinout
 SPIMOSI = 10 # pinout
 SPICS = 8 # pinout
 
+LOGGING = True # flag
+
 class Controller(object):
     """Control abstraction"""
 
@@ -78,26 +80,41 @@ class Controller(object):
         count = 0
         while self.running:
             count = count + 1
-            if count % 200 == 0:
-                print "\nControls"
+            if LOGGING and count % 200 == 0:
+                print datetime.now(), "\n[property-group] Controls"
                 for iprop in self.controls:
-                    print iprop, self.controls[iprop]
-                print "\nMeasurements"
+                    print datetime.now(), "[property]", iprop, self.controls[iprop]
+                print "[property] Measurements"
                 for iprop in self.measurements:
-                    print iprop, self.measurements[iprop]
+                    print datetime.now(), "[property]", iprop, self.measurements[iprop]
             last_change_diff = (datetime.now() - \
               self.controls['last_state_change']).total_seconds()
+            if LOGGING and count % 200 == 0:
+                print datetime.now(), "[property] Last Change Diff: ", last_change_diff
             if self.controls['override']:
                 self.enable_ac(True)
+                if LOGGING and count % 200 == 0:
+                    print datetime.now(), "[override] overridden, enable AC"
             elif self.controls['enabled'] and last_change_diff > MIN_TIME:
                 outside_temp = self.read_temperature()
+                if LOGGING and count % 200 == 0:
+                    print datetime.now(), \
+                        "[property] exceeded min threshold, Outside Temp:", outside_temp
                 if outside_temp < (self.controls['temperature'] - THRESHOLD):
                     self.enable_ac(False)
+                    if LOGGING and count % 200 == 0:
+                        print datetime.now(), \
+                            "[ac-disable] outside temp below setting minus threshold"
                 if outside_temp > (self.controls['temperature'] + THRESHOLD):
                     self.enable_ac(True)
+                    if LOGGING and count % 200 == 0:
+                        print datetime.now(), \
+                            "[ac-enable] outside temp above setting plus threshold"
             elif not self.controls['enabled'] and last_change_diff > MIN_TIME:
                 self.enable_ac(False)
-
+                if LOGGING and count % 200 == 0:
+                    print datetime.now(), \
+                        "[ac-disable] controls set to false, last_change_diff more than min time"
             self.set_button_state()
             # self.controls['override'] = (True and self.measurements['button_state'])
 
@@ -143,6 +160,8 @@ class Controller(object):
         if self.controls['ac_on'] != enabled:
             self.controls['last_state_change'] = datetime.now()
         self.controls['ac_on'] = (True and enabled)
+        if LOGGING:
+            print datetime.now(), "[enable-ac] AC on set to", enabled
         self.set_servo(self.controls['ac_on'])
 
     def read_temperature(self):
@@ -150,10 +169,17 @@ class Controller(object):
         analog_read = self.readadc(0, SPICLK, SPIMOSI, SPIMISO, SPICS)
         temp_celsius = analog_read * 100
         self.measurements['actual_temperature'] = temp_celsius * 9.0 / 5.0 + 32.0
+        if LOGGING:
+            print datetime.now(), "[read-temp] analog_read:", analog_read
+            print datetime.now(), "[read-temp] temp_celsius:", temp_celsius
+            print datetime.now(), "[read-temp] temp_fahrenheit:", \
+                self.measurements['actual_temperature']
         return self.measurements['actual_temperature']
 
     def set_servo(self, servo_on):
         """Sets servo to turn AC either on or off"""
+        if LOGGING:
+            print datetime.now(), "[set-servo] servo on (AC on) set to", servo_on
         if servo_on:
             self.controls['servo_angle'] = SERVO_ON_ANGLE
         else:
@@ -165,8 +191,14 @@ class Controller(object):
         """Uses status of button and web server to determine button state"""
         self.measurements['last_button_state'] = self.measurements['button_state']
         self.measurements['button_state'] = GPIO.input(BUTTON_INDEX)
+        if LOGGING:
+            print datetime.now(), "[button-state] Last Button State:", \
+                self.measurements['last_button_state']
+            print datetime.now(), "[button-state] Button State:", self.measurements['button_state']
         if self.measurements['last_button_state'] != self.measurements['button_state']:
             self.set_controller_state(not self.get_controller_state())
+            if LOGGING:
+                print datetime.now(), "[button-state] Switched controller state"
 
     def set_led_1(self):
         """Sets LED 1 based on instance vars (ac_on)"""
