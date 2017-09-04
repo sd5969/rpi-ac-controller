@@ -81,10 +81,10 @@ class Controller(object):
         while self.running:
             count = count + 1
             if LOGGING and count % 200 == 0:
-                print datetime.now(), "\n[property-group] Controls"
+                print "\n", datetime.now(), "[property-group] Controls"
                 for iprop in self.controls:
                     print datetime.now(), "[property]", iprop, self.controls[iprop]
-                print "[property] Measurements"
+                print "\n", datetime.now(), "[property-group] Measurements"
                 for iprop in self.measurements:
                     print datetime.now(), "[property]", iprop, self.measurements[iprop]
             last_change_diff = (datetime.now() - \
