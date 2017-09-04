@@ -191,10 +191,10 @@ class Controller(object):
         """Uses status of button and web server to determine button state"""
         self.measurements['last_button_state'] = self.measurements['button_state']
         self.measurements['button_state'] = GPIO.input(BUTTON_INDEX)
-        if LOGGING:
-            print datetime.now(), "[button-state] Last Button State:", \
-                self.measurements['last_button_state']
-            print datetime.now(), "[button-state] Button State:", self.measurements['button_state']
+        # if LOGGING:
+        #     print datetime.now(), "[button-state] Last Button State:", \
+        #         self.measurements['last_button_state']
+        #     print datetime.now(), "[button-state] Button State:", self.measurements['button_state']
         if self.measurements['last_button_state'] != self.measurements['button_state']:
             self.set_controller_state(not self.get_controller_state())
             if LOGGING:
