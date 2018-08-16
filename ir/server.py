@@ -77,12 +77,14 @@ def _api_handler_factory(controller):
                 self.send_header("Content-length", "0")
                 self.end_headers()
                 os.system("irsend SEND_ONCE airconditioner BTN_Y")
+                os.system("irsend SEND_ONCE airconditioner BTN_Y")
 
             def decrease_temperature(self, body):
                 """Decrease temperature"""
                 self.send_response(201)
                 self.send_header("Content-length", "0")
                 self.end_headers()
+                os.system("irsend SEND_ONCE airconditioner BTN_Z")
                 os.system("irsend SEND_ONCE airconditioner BTN_Z")
 
             def post_default(self, _):
