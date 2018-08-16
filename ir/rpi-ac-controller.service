@@ -1,0 +1,14 @@
+[Unit]
+Description=RPi AC Controller (Python HTTP Server)
+
+[Service]
+PIDFile=/var/run/rpi_ac_controller-99.pid
+User=root
+Group=root
+Restart=always
+KillSignal=SIGQUIT
+WorkingDirectory=/home/pi/rpi-ac-controller/ir/
+ExecStart=/usr/bin/python2.7 /home/pi/rpi-ac-controller/ir/main.py
+
+[Install]
+WantedBy=multi-user.target
