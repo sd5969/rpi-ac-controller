@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AC Controller</title>
+  <script src="lib/angular/angular.min.js"></script>
+  <script>
+    var app = angular.module('acWebApp', []);
+    app.controller('acWebController', function($scope, $http) {
+        $scope.powerSwitchEnabled = true;
+        $scope.error = '';
+
+        function setControls(enabled) {
+          $scope.powerSwitchEnabled = enabled;
+        }
+
+        function setError(error) {
+          $scope.error = error;
+        }
+
+        setControls(false);
+        var initPromises = [];
+
+        initPromises.push(
+          $http({
+            method: 'GET',
+            url: '/api/power-enabled'
+          })
+          .then(res => {
+            $scope.powerSwitchEnabled = res.data.enabled;
+            setError('');
+            setControls(res.data.enabled);
+          })
+          .catch(err => {
+            setError(err);
+            setControls(false);
+          })
+        );
+
+        Promise.all(initPromises)
+        .then(() => {
+          setError('');
+        })
+        .catch(err => {
+          setError(err);
+        });
+
+        $scope.powerSwitch = function() {
+          setControls(false);
+          $http({
+            method: 'POST',
+            url: '/api/power-switch',
+            data: '{}',
+            headers: {'Content-type': 'application/json'}
+          })
+          .then(res => {
+            setError('');
+          })
+          .catch(err => {
+            setError(err);
+          });
+        }
+
+        $scope.increaseTemp = function() {
+          $http({
+            method: 'POST',
+            url: '/api/increase-temperature',
+            data: '{}',
+            headers: {'Content-type': 'application/json'}
+          })
+          .then(res => {
+            setError('');
+          })
+          .catch(err => {
+            setError(err);
+          });
+        }
+
+        $scope.decreaseTemp = function() {
+          $http({
+            method: 'POST',
+            url: '/api/decrease-temperature',
+            data: '{}',
+            headers: {'Content-type': 'application/json'}
+          })
+          .then(res => {
+            setError('');
+          })
+          .catch(err => {
+            setError(err);
+          });
+        }
+    });
+  </script>
+  <style>
+    .pageBody {
+      padding: 20px;
+    }
+    .title {
+      font-weight: bold;
+    }
+    .controls {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body ng-app="acWebApp" ng-controller="acWebController">
+  <div class="pageBody">
+    <div class="controls">
+      <input type="button" ng-click="powerSwitch()"
+          value="Power"
+          ng-disabled="!powerSwitchEnabled" /><br />
+      <input type="button" ng-click="increaseTemp()"
+          value="Increase Temperature" /><br />
+      <input type="button" ng-click="decreaseTemp()"
+          value="Decrease Temperature" /><br />
+    <div class="error">
+      {{error}}
+    </div>
+  </div>
+</body>
+</html>

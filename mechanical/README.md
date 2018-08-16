@@ -1,4 +1,4 @@
-# Raspberry Pi AC Controller
+# Raspberry Pi AC Controller (Mechanical)
 
 ## Overview
 
