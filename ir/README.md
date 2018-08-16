@@ -13,8 +13,8 @@ codes that will interact with my AC unit.
 3. 1 IR 5mm LED
 4. 1 220 Ohm resistor
 5. 1 10k Ohm resistor
-6. transistor?
-7. IR receiver for testing?
+6. PN2222 transistor
+7. IR receiver for testing
 8. A minor amount of programming skill
 
 ## The System
@@ -22,8 +22,12 @@ codes that will interact with my AC unit.
 The AC unit has a hard constraint that it should not be turned on within 3
 minutes of turning it off. Let's keep that in mind as we design.
 
-Let's build an API to "press the buttons" on the existing IR remote.
+Let's build an API to "press the buttons" on the raspberry pi IR remote.
 
-## The Code
+## Hardware Setup
 
-I guess I gotta write something.
+TBD
+
+## Program Execution
+
+TBD

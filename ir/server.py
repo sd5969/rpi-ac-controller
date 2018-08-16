@@ -37,7 +37,7 @@ def _api_handler_factory(controller):
                 self.send_header("Content-type", "application/json")
                 self.end_headers()
                 response = {
-                    'enabled': False
+                    'enabled': True
                 }
                 self.wfile.write(json.dumps(response))
 
@@ -68,25 +68,21 @@ def _api_handler_factory(controller):
                 self.send_response(201)
                 self.send_header("Content-length", "0")
                 self.end_headers()
-                if 'temperature' in body:
-                    try:
-                        new_temp = int(body['temperature'])
-                    except ValueError:
-                        pass
-                if new_temp <= MAX_TEMP and new_temp >= MIN_TEMP:
-                    self.controller.set_temperature(new_temp)
+                os.system("irsend SEND_ONCE airconditioner BTN_X")
 
             def increase_temperature(self, body):
                 """Increase temperature"""
                 self.send_response(201)
                 self.send_header("Content-length", "0")
                 self.end_headers()
+                os.system("irsend SEND_ONCE airconditioner BTN_Y")
 
             def decrease_temperature(self, body):
                 """Decrease temperature"""
                 self.send_response(201)
                 self.send_header("Content-length", "0")
                 self.end_headers()
+                os.system("irsend SEND_ONCE airconditioner BTN_Z")
 
             def post_default(self, _):
                 """Default return"""
