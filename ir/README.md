@@ -42,7 +42,7 @@ resistor, to GPIO 23.
 
 ## System Setup
 
-Now that you've got your hardware ready to get, set up your Raspberry Pi.
+Now that you've got your hardware ready, set up your Raspberry Pi.
 I used an image of Raspbian. You'll need to install some stuff:
 
 ```bash
