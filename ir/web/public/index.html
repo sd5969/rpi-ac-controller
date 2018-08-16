@@ -46,7 +46,6 @@
         });
 
         $scope.powerSwitch = function() {
-          setControls(false);
           $http({
             method: 'POST',
             url: '/api/power-switch',
