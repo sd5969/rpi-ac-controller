@@ -26,8 +26,26 @@ Let's build an API to "press the buttons" on the raspberry pi IR remote.
 
 ## Hardware Setup
 
-TBD
+Refer to the image below, borrowed from [here](https://www.hackster.io/austin-stanton/creating-a-raspberry-pi-universal-remote-with-lirc-2fd581)
+for an example layout. I used a Raspberry Pi Model B Rev 2, so the connections were
+slightly different.
+
+1. Connect the 3.3V to the positive breadboard rail
+2. Connect the ground to the negative breadboard rail
+3. Wire up the IR receiver as indicated. I connected it to GPIO 22
+4. Wire up the IR LED as indicated. Positive end connects, through a 220 Ohm resistor,
+to 3.3V. Negative connects to the collector on the transistor,
+while the emitter connects to ground. The base connects, through a 10k Ohm
+resistor, to GPIO 23.
+
+![wiring](./wiring.jpeg)
 
 ## Program Execution
 
-TBD
+For a quick and dirty setup, run
+
+```bash
+python2.7 main.py
+```
+
+from the `ir` folder.
