@@ -3,6 +3,7 @@
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from threading import Thread
 import json
+import os
 
 MAX_TEMP = 80
 MIN_TEMP = 60
