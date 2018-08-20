@@ -86,6 +86,27 @@ def _api_handler_factory(controller):
                 self.end_headers()
                 os.system("irsend SEND_ONCE airconditioner BTN_Z")
                 os.system("irsend SEND_ONCE airconditioner BTN_Z")
+                
+            def input_one(self, body):
+                """Press HDMI Input 1"""
+                self.send_response(201)
+                self.send_header("Content-length", "0")
+                self.end_headers()
+                os.system("irsend SEND_ONCE hdmiswitch BTN_1")
+
+            def input_two(self, body):
+                """Press HDMI Input 2"""
+                self.send_response(201)
+                self.send_header("Content-length", "0")
+                self.end_headers()
+                os.system("irsend SEND_ONCE hdmiswitch BTN_2")
+                
+            def input_three(self, body):
+                """Press HDMI Input 3"""
+                self.send_response(201)
+                self.send_header("Content-length", "0")
+                self.end_headers()
+                os.system("irsend SEND_ONCE hdmiswitch BTN_3")
 
             def post_default(self, _):
                 """Default return"""
@@ -104,7 +125,10 @@ def _api_handler_factory(controller):
             options = {
                 '/api/power-switch': power_switch,
                 '/api/increase-temperature': increase_temperature,
-                '/api/decrease-temperature': decrease_temperature
+                '/api/decrease-temperature': decrease_temperature,
+                '/api/hdmi-one': input_one,
+                '/api/hdmi-two': input_two,
+                '/api/hdmi-three': input_three,
             }
             options.get(self.path, post_default)(self, parsed_body)
 

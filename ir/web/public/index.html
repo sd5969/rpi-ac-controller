@@ -51,6 +51,13 @@
             url: '/api/power-switch',
             data: '{}',
             headers: {'Content-type': 'application/json'}
+          }).then(res => {
+            return $http({
+                method: 'POST',
+                url: 'http://192.168.1.123:8181/api/power-switch',
+                data: '{}',
+                headers: {'Content-type': 'application/json'}
+            });
           })
           .then(res => {
             setError('');
@@ -68,6 +75,14 @@
             headers: {'Content-type': 'application/json'}
           })
           .then(res => {
+              return $http({
+                  method: 'POST',
+                  url: 'http://192.168.1.123:8181/api/increase-temperature',
+                  data: '{}',
+                  headers: {'Content-type': 'application/json'}
+              });
+          })
+          .then(res => {
             setError('');
           })
           .catch(err => {
@@ -81,6 +96,83 @@
             url: '/api/decrease-temperature',
             data: '{}',
             headers: {'Content-type': 'application/json'}
+          })
+          .then(res => {
+              return $http({
+                method: 'POST',
+                url: 'http://192.168.1.123:8181/api/decrease-temperature',
+                data: '{}',
+                headers: {'Content-type': 'application/json'}
+            });
+          })
+          .then(res => {
+            setError('');
+          })
+          .catch(err => {
+            setError(err);
+          });
+        }
+        
+        $scope.hdmiOne = function() {
+          $http({
+            method: 'POST',
+            url: '/api/hdmi-one',
+            data: '{}',
+            headers: {'Content-type': 'application/json'}
+          })
+          .then(res => {
+              return $http({
+                method: 'POST',
+                url: 'http://192.168.1.123:8181/api/hdmi-one',
+                data: '{}',
+                headers: {'Content-type': 'application/json'}
+            });
+          })
+          .then(res => {
+            setError('');
+          })
+          .catch(err => {
+            setError(err);
+          });
+        }
+        
+        $scope.hdmiTwo = function() {
+          $http({
+            method: 'POST',
+            url: '/api/hdmi-two',
+            data: '{}',
+            headers: {'Content-type': 'application/json'}
+          })
+          .then(res => {
+              return $http({
+                method: 'POST',
+                url: 'http://192.168.1.123:8181/api/hdmi-two',
+                data: '{}',
+                headers: {'Content-type': 'application/json'}
+            });
+          })
+          .then(res => {
+            setError('');
+          })
+          .catch(err => {
+            setError(err);
+          });
+        }
+        
+        $scope.hdmiThree = function() {
+          $http({
+            method: 'POST',
+            url: '/api/hdmi-three',
+            data: '{}',
+            headers: {'Content-type': 'application/json'}
+          })
+          .then(res => {
+              return $http({
+                method: 'POST',
+                url: 'http://192.168.1.123:8181/api/hdmi-three',
+                data: '{}',
+                headers: {'Content-type': 'application/json'}
+            });
           })
           .then(res => {
             setError('');
@@ -113,6 +205,12 @@
           value="Increase Temperature" /><br />
       <input type="button" ng-click="decreaseTemp()"
           value="Decrease Temperature" /><br />
+      <input type="button" ng-click="hdmiOne()"
+          value="HDMI 1" /><br />
+      <input type="button" ng-click="hdmiTwo()"
+          value="HDMI 2" /><br />
+      <input type="button" ng-click="hdmiThree()"
+          value="HDMI 3" /><br />
     <div class="error">
       {{error}}
     </div>
