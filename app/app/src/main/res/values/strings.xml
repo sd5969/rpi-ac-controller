@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">RPi AC Controller</string>
+    <string name="ac_power_text">AC Power</string>
+    <string name="temp_up_text">Temp Up</string>
+    <string name="temp_down_text">Temp Down</string>
+    <string name="hdmi_1_text">HDMI 1</string>
+    <string name="hdmi_2_text">HDMI 2</string>
+    <string name="hdmi_3_text">HDMI 3</string>
+</resources>
