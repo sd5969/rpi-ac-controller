@@ -22,8 +22,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v)
             {
                 System.out.println("Clicked AC Power");
-                new LongRunningGetIO().execute("power-switch", "remote");
-                new LongRunningGetIO().execute("power-switch", "local");
+                new LongRunningGetIO().execute("power-switch");
             }
         });
 
@@ -32,8 +31,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v)
             {
                 System.out.println("Clicked Temp Up");
-                new LongRunningGetIO().execute("increase-temperature", "remote");
-                new LongRunningGetIO().execute("increase-temperature", "local");
+                new LongRunningGetIO().execute("increase-temperature");
             }
         });
 
@@ -42,8 +40,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v)
             {
                 System.out.println("Clicked Temp Down");
-                new LongRunningGetIO().execute("decrease-temperature", "remote");
-                new LongRunningGetIO().execute("decrease-temperature", "local");
+                new LongRunningGetIO().execute("decrease-temperature");
             }
         });
 
@@ -52,8 +49,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v)
             {
                 System.out.println("Clicked HDMI 1");
-                new LongRunningGetIO().execute("hdmi-one", "remote");
-                new LongRunningGetIO().execute("hdmi-one", "local");
+                new LongRunningGetIO().execute("hdmi-one");
             }
         });
 
@@ -62,8 +58,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v)
             {
                 System.out.println("Clicked HDMI 2");
-                new LongRunningGetIO().execute("hdmi-two", "remote");
-                new LongRunningGetIO().execute("hdmi-two", "local");
+                new LongRunningGetIO().execute("hdmi-two");
             }
         });
 
@@ -72,8 +67,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v)
             {
                 System.out.println("Clicked HDMI 3");
-                new LongRunningGetIO().execute("hdmi-three", "remote");
-                new LongRunningGetIO().execute("hdmi-three", "local");
+                new LongRunningGetIO().execute("hdmi-three");
             }
         });
     }
@@ -82,16 +76,15 @@ public class MainActivity extends AppCompatActivity {
 
         private Exception exception;
         static final String POST_DATA = "{}";
-        final String[] API_BASE_URLS = new String[] {"http://nyc.sanjitdutta.com:8181/api/", "http://192.168.1.123:8181/api/"};
+        static final String API_BASE_URL = "http://nyc.sanjitdutta.com:8181/api/";
         final byte[] POST_DATA_BYTES = POST_DATA.getBytes(Charset.forName("UTF-8"));
         final int POST_DATA_LENGTH = POST_DATA_BYTES.length;
 
         protected void onPreExecute() {}
 
         protected String doInBackground(String... args) {
-            final int apiIndex = args[1] == "local" ? 1 : 0;
             try {
-                URL url = new URL(API_BASE_URLS[apiIndex] + args[0]);
+                URL url = new URL(API_BASE_URL + args[0]);
                 System.out.println("Hitting endpoint: " + url);
 
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
